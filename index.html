@@ -1,0 +1,261 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketing ROI Calculator</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 35px 18px;
+  font-family: Arial, sans-serif;
+  background: #f4f6fb;
+  color: #182238;
+}
+
+.container {
+  max-width: 850px;
+  margin: auto;
+}
+
+.header {
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  font-size: 30px;
+  color: #263c91;
+  margin-bottom: 8px;
+}
+
+.header p {
+  color: #69758a;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  margin-bottom: 22px;
+  box-shadow: 0 4px 18px #1822380d;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #dce1ec;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 8px;
+  background: #3449a3;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 22px;
+}
+
+button:hover {
+  background: #26377f;
+}
+
+.results {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.metric {
+  padding: 20px;
+  border-radius: 10px;
+  background: #f0f3ff;
+}
+
+.metric p {
+  margin: 0 0 10px;
+  color: #68758b;
+}
+
+.metric h2 {
+  margin: 0;
+  color: #293f94;
+  font-size: 25px;
+}
+
+.note {
+  color: #7a8494;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+#error {
+  color: #c0392b;
+  margin-top: 15px;
+}
+
+@media (max-width: 600px) {
+  .grid, .results {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="container">
+
+  <header class="header">
+    <h1>Marketing ROI Calculator</h1>
+    <p>Understand your advertising performance with simple marketing metrics.</p>
+  </header>
+
+  <section class="card">
+    <h2>Campaign Information</h2>
+
+    <div class="grid">
+      <div>
+        <label for="spend">Advertising Spend (₹)</label>
+        <input type="number" id="spend" min="0" value="10000">
+      </div>
+
+      <div>
+        <label for="revenue">Revenue Generated (₹)</label>
+        <input type="number" id="revenue" min="0" value="30000">
+      </div>
+
+      <div>
+        <label for="leads">Total Leads</label>
+        <input type="number" id="leads" min="0" value="200">
+      </div>
+
+      <div>
+        <label for="conversions">Total Conversions</label>
+        <input type="number" id="conversions" min="0" value="20">
+      </div>
+    </div>
+
+    <button id="calculate">Calculate Performance</button>
+    <p id="error" role="alert"></p>
+  </section>
+
+  <section class="card">
+    <h2>Campaign Performance</h2>
+
+    <div class="results">
+      <div class="metric">
+        <p>Return on Ad Spend</p>
+        <h2 id="roas">3.00x</h2>
+      </div>
+
+      <div class="metric">
+        <p>Marketing ROI</p>
+        <h2 id="roi">200%</h2>
+      </div>
+
+      <div class="metric">
+        <p>Cost Per Lead</p>
+        <h2 id="cpl">₹50.00</h2>
+      </div>
+
+      <div class="metric">
+        <p>Cost Per Acquisition</p>
+        <h2 id="cpa">₹500.00</h2>
+      </div>
+
+      <div class="metric">
+        <p>Conversion Rate</p>
+        <h2 id="conversionRate">10%</h2>
+      </div>
+
+      <div class="metric">
+        <p>Revenue Generated</p>
+        <h2 id="revenueResult">₹30,000</h2>
+      </div>
+    </div>
+
+    <p class="note">
+      ROI is calculated using advertising spend only.
+      Other business expenses are not included.
+    </p>
+  </section>
+
+  <p class="note">
+    Marketing ROI Calculator | Open Source Project
+  </p>
+
+</main>
+
+<script>
+const numberFormat = new Intl.NumberFormat("en-IN", {
+  maximumFractionDigits: 2
+});
+
+function calculate() {
+  const spend = Number(document.getElementById("spend").value);
+  const revenue = Number(document.getElementById("revenue").value);
+  const leads = Number(document.getElementById("leads").value);
+  const conversions = Number(document.getElementById("conversions").value);
+
+  const error = document.getElementById("error");
+
+  if (
+    ![spend, revenue, leads, conversions].every(Number.isFinite) ||
+    spend <= 0 ||
+    revenue < 0 ||
+    leads < 0 ||
+    conversions < 0 ||
+    conversions > leads
+  ) {
+    error.textContent = "Please enter valid values. Advertising spend must be greater than zero, and conversions cannot exceed leads.";
+    return;
+  }
+
+  error.textContent = "";
+
+  const roas = revenue / spend;
+  const roi = ((revenue - spend) / spend) * 100;
+  const cpl = leads > 0 ? spend / leads : 0;
+  const cpa = conversions > 0 ? spend / conversions : 0;
+  const conversionRate = leads > 0 ? (conversions / leads) * 100 : 0;
+
+  document.getElementById("roas").textContent = roas.toFixed(2) + "x";
+  document.getElementById("roi").textContent = roi.toFixed(2) + "%";
+  document.getElementById("cpl").textContent = "₹" + numberFormat.format(cpl);
+  document.getElementById("cpa").textContent = conversions > 0
+    ? "₹" + numberFormat.format(cpa)
+    : "N/A";
+  document.getElementById("conversionRate").textContent = conversionRate.toFixed(2) + "%";
+  document.getElementById("revenueResult").textContent = "₹" + numberFormat.format(revenue);
+}
+
+document.getElementById("calculate").addEventListener("click", calculate);
+
+calculate();
+</script>
+
+</body>
+</html>
